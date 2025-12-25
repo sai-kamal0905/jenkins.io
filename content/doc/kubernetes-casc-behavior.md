@@ -1,3 +1,8 @@
+This PR documents the behavior of Kubernetes cloud configuration with Jenkins CasC.  
+Includes test cases, results, and examples.
+
+Related JIRA issue: JENKINS-76153
+
 What I tested
 
 Jenkins was started with CasC enabled.
