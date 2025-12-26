@@ -133,6 +133,17 @@ This permission allows users to delete existing agents.
 Agent/Disconnect::
 This permission allows users to disconnect agents or mark agents as temporarily offline.
 
+Agent/ExtendedRead::
+Allows read-only access to agent configuration and agent logs.
+Users can view agent settings but cannot create, modify, or delete agents.
+This permission is useful for troubleshooting and inspection without granting administrative access.
+
+For example, a user with `Agent/ExtendedRead` permission can open
+**Manage Jenkins → Nodes**, select an agent such as `linux-agent-01`,
+and view its labels, executors, launch method, status, and logs.
+The user cannot modify the agent configuration, change labels,
+disconnect or delete the agent, or create new agents.
+
 === _Job_ Permissions
 
 Though these permissions use the word "Job" in their name,
@@ -166,6 +177,16 @@ Required to move a job from one folder (or Jenkins root) to another.
 
 Job/Read::
 See a job. (You may deny this permission but allow Discover to force an anonymous user to log in to see the job.)
+
+Job/ExtendedRead::
+Allows read-only access to job configuration pages.
+Users can view job configuration but cannot modify or save changes.
+This permission is commonly used in read-only Jenkins environments.
+
+For example, a user with `Job/ExtendedRead` permission can open the
+configuration page of a job such as `build-backend-service` and view
+its SCM settings, build steps, and triggers, but cannot save or modify
+the job configuration.
 
 Job/Workspace::
 This permission grants the ability to retrieve the contents of a workspace Jenkins checked out for performing builds.
@@ -224,8 +245,16 @@ These permissions are not enabled by default.
 
 === Access granted with Overall/SystemRead
 
-This permission grants read-only access to the Jenkins global configuration.
-Its primarily intended to be used when the Jenkins configuration is managed externally, e.g. using the plugin:configuration-as-code/[Configuration as Code] plugin.
+This permission is typically combined with `Job/ExtendedRead` and
+`Agent/ExtendedRead` to provide a fully read-only Jenkins experience,
+where users can inspect configuration without being able to make changes.
+
+For example, a user with `Overall/SystemRead` permission can view
+global Jenkins settings such as installed plugins, tool configurations,
+and system diagnostics, but cannot change or apply any system-level
+configuration.
+
+It is primarily intended to be used when the Jenkins configuration is managed externally, e.g. using the plugin:configuration-as-code/[Configuration as Code] plugin.
 It works best when combined with the _ExtendedRead_ permission that allows read-only access to agents and items.
 
 This permission can be enabled by setting link:/doc/book/managing/system-properties/#jenkins-security-systemreadpermission[the system property `jenkins.security.SystemReadPermission` to `true`] or installing the plugin:extended-read-permission[Extended Read Permission] plugin.
@@ -268,4 +297,26 @@ This model has been retired.
 While these permissions still exist, they're no longer used by Jenkins core and related features have been removed, e.g., uploading plugins or using the script console just requires Overall/Administer permission now.
 
 For more fine-grained access to the global configuration, the permissions _Overall/Manage_ and _Overall/SystemRead_ can optionally be enabled.
+
+== Read-only Jenkins Configuration
+
+Read-only Jenkins is a configuration model where users can view job,
+agent, and system configuration without being able to modify it.
+
+This model is commonly used when Jenkins configuration is managed
+externally, for example using Jenkins Configuration as Code (JCasC).
+
+Read-only Jenkins is implemented by combining the following permissions:
+* `Overall/SystemRead`
+* `Job/ExtendedRead`
+* `Agent/ExtendedRead`
+
+This approach allows safer access for developers and operators to
+inspect configuration, debug issues, and verify plugin settings
+without requiring administrative privileges.
+
+NOTE: Not all plugins fully support read-only mode yet.
+Some plugin configuration pages may still appear editable even when
+`Overall/SystemRead` and `ExtendedRead` permissions are granted.
+
 
